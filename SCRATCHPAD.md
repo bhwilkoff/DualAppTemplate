@@ -1,6 +1,9 @@
 # Project Scratchpad — [APP NAME]
 
-## Current State
+> Active working notes. When this file exceeds ~150 lines, move
+> completed milestone detail to ARCHIVE.md and keep this lean.
+
+## Current state
 
 - **Status**: NOT STARTED
 - **Active milestone**: M0
@@ -13,64 +16,64 @@
 
 ---
 
-## Feature Parity Status
+## Feature parity status
 
-✅ Complete on both | 🌐 Web only | 📱 iOS only | ⏳ Planned | ❌ Deferred
+✅ Both | 🌐 Web only | 📱 iOS only | ⏳ Planned | ❌ Deferred
 
 | Feature | Web | iOS | Notes |
 |---|---|---|---|
-| <!-- Add features as you build them --> | | | |
+| <!-- Add features as you ship them --> | | | |
 
 ---
 
 ## Milestones
 
-### M0 — Project Setup
-- [ ] CLAUDE.md filled in with project identity
-- [ ] Xcode project created at repo root (Xcode Cloud compatible)
+### M0 — Project setup
+- [ ] CLAUDE.md filled in with project identity (app name, what it
+      does, tech stack specifics, design tokens)
+- [ ] Xcode project created at repo root (no spaces in name)
 - [ ] GitHub Pages enabled, index.html live
 - [ ] First commit pushed
 - [ ] Xcode Cloud workflow created (if using)
 
 ### M1 — [First user-visible capability]
 <!-- One sentence: what can a user DO after this milestone? -->
-- **Learning check**: [ ] Deepens understanding [ ] Invites participation [ ] Supports agency
-- **Acceptance criteria** (observable by users, not developers):
-  - [ ] ...
+
+Before implementing, run the learning-orientation-design skill:
+- [ ] Deepens understanding
+- [ ] Invites participation
+- [ ] Supports agency
+- [ ] Clarity over cleverness
+
+**Acceptance criteria** (observable by users, not developers):
+- [ ] …
 
 ### M2 — [Second user-visible capability]
-- **Learning check**: [ ] Deepens understanding [ ] Invites participation [ ] Supports agency
-- **Acceptance criteria**:
-  - [ ] ...
+- Learning-orientation check passed
+- **Acceptance**:
+  - [ ] …
 
 ---
 
-## Web App Status
+## When to add a binding design doc
 
-### Completed
-- (none yet)
-
-### Next for Web
-- M0 setup
-
----
-
-## iOS App Status
-
-### Completed
-- (none yet)
-
-### Next for iOS
-- M0 setup: create Xcode project at repo root
+When your project crosses ~5 views OR you find yourself making
+inconsistent UI choices, create `DESIGN.md` (iOS) and/or
+`WEB-DESIGN.md` (web). Invoke `binding-design-doc-discipline` for
+the workflow. The doc captures the rules that govern every new
+view / sheet / picker / nav level. Treat as binding from the moment
+it exists.
 
 ---
 
-## Open Questions
+## Open questions
 
-<!-- Add questions as they arise; remove when resolved -->
+<!-- Add questions as they arise; remove when resolved. Don't
+     accumulate — every question should have a path to resolution. -->
 
 ---
 
-## Session Log
+## Session log
 
-<!-- Append-only. Format: state found → work done → state left -->
+<!-- Append-only. Format: state found → work done → state left.
+     Keep entries short — one paragraph per session. -->

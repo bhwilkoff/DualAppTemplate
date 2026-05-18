@@ -1,19 +1,37 @@
-Log an architecture decision:
+Log an architecture decision in DECISIONS.md.
 
-1. Find the highest existing "Decision NNN" number in DECISIONS.md
-2. If not provided in args, ask for: decision, rationale, alternatives considered, trade-offs
-3. Note which platform it applies to: [SHARED], [WEB], or [iOS]
-4. Append the new decision in this exact format:
+Invoke the `architectural-decision-log` skill for the full methodology.
+Short version:
 
+1. Find the highest existing decision number in DECISIONS.md
+2. If not provided in args, ask: what's the decision, what's the WHY,
+   how do future contributors apply it?
+3. Note which platform applies: [SHARED] / [WEB] / [iOS]
+4. Append in this format:
+
+```
 ---
 
-## Decision NNN — [Short title]
+## NNN — Short imperative title
 *Date: YYYY-MM-DD*
 
-**Decision**: [One sentence]
-**Rationale**: [Why this is right]
-**Alternatives considered**: [Other options]
-**Trade-offs**: [Gains and losses]
+One paragraph stating the concrete decision. Lead with WHAT in
+specific terms — avoid prose buildup; the first sentence is the
+choice.
 
-5. Confirm: "Decision NNN logged"
-6. NEVER edit or remove existing entries
+**Why**: the constraint, past incident, or alternative-rejected that
+makes this choice make sense. References to bugs/projects that drove
+it.
+
+**How to apply**: when the next developer encounters this decision,
+what should they do or not do?
+
+(Optional) **Consequences**: forward-looking implications for
+adjacent systems.
+```
+
+5. The entry must answer: "what would the next developer get wrong
+   if they didn't know this?" If it doesn't, the entry isn't earning
+   its keep — push back and ask for a sharper rationale.
+6. Confirm: "Decision NNN logged"
+7. NEVER edit or remove existing entries — append-only.

@@ -1,116 +1,119 @@
 # Dual App Template — Web + iOS with Claude Code
 
-A project template for building web and iOS apps in parallel with full
-feature parity. Designed for use with Claude Code, GitHub Pages, and Xcode
-Cloud.
+Project template for building web and iOS apps in parallel with full
+feature parity. Designed for Claude Code, GitHub Pages, and Xcode
+Cloud. Skill-aware: the methodology lives in global skills, so this
+template stays lean.
 
-## What's in the Template
+## What's in the template
 
 ```
 /
-├── CLAUDE.md              Project identity + standing instructions for Claude
-├── SCRATCHPAD.md          Session state, milestones, feature parity table
-├── DECISIONS.md           Append-only architecture decision record
-├── .claude/               Claude Code hooks and slash commands
+├── CLAUDE.md              Project identity + skill-aware standing instructions (~150 lines)
+├── SCRATCHPAD.md          Active milestone + feature parity (~70 lines)
+├── DECISIONS.md           Decision log — leads with WHY (~70 lines)
+├── README.md              This file
+├── .claude/               Slash commands + session-start hook
 ├── index.html             Web app entry point
 ├── css/styles.css         Mobile-first CSS with custom properties
-├── js/app.js              Web app logic (view system scaffold)
-├── js/api.js              API abstraction layer
+├── js/app.js, js/api.js   Web app logic + API abstraction
 ├── manifest.json          PWA manifest
-├── assets/                Static assets (icons, images)
-├── ios/                   iOS Swift source files (starter kit)
-│   ├── App/               Entry point
-│   ├── ContentView.swift  Root view + sidebar
-│   ├── Models/            Data models
-│   ├── Views/             Feature views
-│   ├── Components/        Reusable UI components
-│   ├── Networking/        API client
-│   ├── Store/             @Observable global state
-│   └── Assets.xcassets/   App icon + colors
+├── assets/                Static assets
+├── ios/                   iOS Swift starter (moves into Xcode project on setup)
 ├── AppVersion.xcconfig    Shared version numbers
 ├── ci_scripts/            Xcode Cloud build scripts
-└── .gitignore             Ignores build artifacts, Xcode user data
+└── .gitignore             Build artifacts + Xcode user data
 ```
 
-## Setup — 7 Steps
+## Setup — 7 steps
 
-1. **Use this template** on GitHub (or clone and re-init git)
-2. **Fill in CLAUDE.md** — project name, description, tech stack, design tokens
-3. **Fill in SCRATCHPAD.md** — milestones M1, M2, M3
+1. **Use as template** on GitHub (or clone + re-init git)
+2. **Fill in CLAUDE.md** — project name, what the app does, design
+   tokens. Leave the methodology sections; they point at skills.
+3. **Fill in SCRATCHPAD.md** — M1, M2 milestones with
+   learning-orientation-design checks
 4. **Create the Xcode project**:
    - Xcode → File → New → Project → iOS → App
-   - Product Name: `AppName` (NO SPACES — critical for Xcode Cloud)
-   - Save to the **repository root** (not a subdirectory)
-   - Move the Swift source files from `ios/` into the Xcode-created
-     `AppName/` group, then delete the `ios/` directory
-   - Add `AppVersion.xcconfig` to both Debug and Release configurations
-5. **Push to GitHub** and enable GitHub Pages (Settings → Pages → main branch)
-6. **Xcode Cloud** (optional): Create a workflow in App Store Connect.
-   The `.xcodeproj` at root means Xcode Cloud finds it automatically
-7. **Start coding** — Claude Code loads context automatically via the
+   - Product Name: `AppName` (NO spaces — Xcode Cloud requirement)
+   - Save to **repo root** (not a subdirectory)
+   - Move `ios/` Swift files into the Xcode-created `AppName/` group,
+     then delete the `ios/` directory
+   - Add `AppVersion.xcconfig` to both Debug + Release configs
+5. **Push to GitHub** + enable GitHub Pages (Settings → Pages → main)
+6. **Xcode Cloud** (optional) — workflow in App Store Connect.
+   `.xcodeproj` at root means Xcode Cloud finds it automatically.
+7. **Start building** — Claude Code loads context via the
    session-start hook
 
-## How Sessions Work
+## How sessions work
 
-1. Session-start hook injects CLAUDE.md + current state from SCRATCHPAD.md
-2. Claude follows standing instructions silently
-3. At session end, update SCRATCHPAD.md current state and append session log
-4. Slash commands: `/status`, `/milestone`, `/decision`
+- Session-start hook injects CLAUDE.md + current state from
+  SCRATCHPAD.md
+- Slash commands: `/status`, `/milestone`, `/decision`
+- Global skills (`~/.claude/skills/`) provide the methodology — see
+  CLAUDE.md "How we build" for the trigger table
 
-## Xcode Cloud Compatibility
+## Methodology — skill-aware
 
-This template solves the "Project does not exist at the root of the
-repository" error by keeping `.xcodeproj` at the repo root with no spaces
-in the project name. The `ci_scripts/ci_post_clone.sh` script runs after
-Xcode Cloud clones the repo — use it for any pre-build setup.
+This template doesn't repeat the methodology that's in the global
+skills. Invoke skills by name when their trigger matches:
 
-## Key Conventions Baked In
+**Workflow**:
+- `binding-design-doc-discipline` — when DESIGN.md exists, quote the
+  rule before proposing UI work
+- `architectural-decision-log` — when adding to DECISIONS.md
+- `feature-shipping-discipline` — 7-step end-to-end ship sequence
 
-**From building Bsky Dreams (production web + iOS app):**
+**Design**:
+- `learning-orientation-design` — four-question test for new features
+- `mobile-first-density-design` — density from removing chrome
+- `native-platform-first` — exhaust native APIs before custom
+- `universal-feature-states` — loading/empty/error/offline +
+  5 teaching surfaces
 
-- Web: vanilla HTML/CSS/JS, single-page view system, API abstraction layer
+**3D / RealityKit**:
+- `realitykit-3d-card-rendering`, `3d-feature-sim-validation`,
+  `3d-feature-debug-loop`
+
+**iOS framework depth**: `all-ios-skills:<name>` (40+ skills covering
+SwiftUI, SwiftData, networking, security, Liquid Glass, etc.).
+
+**Design system depth**: `KUI:<name>` (system, brand, screen, review,
+code, a11y, darkmode, trends, figma).
+
+**App Store**: `app-store-screenshots` for marketing assets,
+`all-ios-skills:app-store-review` for rejection prevention.
+
+## What this template encodes
+
+**From previous production builds**:
+- Web: vanilla HTML/CSS/JS, single-page view system, API abstraction
 - iOS: SwiftUI + @Observable + SwiftData, no third-party packages
-- Shared: feature parity tracking, design token alignment, dual-platform
-  decision records
+- Shared: feature parity tracking, design-token alignment, dual-
+  platform decision records
 - Version management via xcconfig (not Xcode UI)
-- In-memory caches for SwiftData queries to prevent cascade re-renders
-- NSFW/content label filtering pattern for feed views
-- Hybrid feed merging (multiple API sources in parallel, dedup, trending sort)
-- VideoPlayer crash prevention (`.transaction { $0.animation = nil }`)
-- Image resize as a shared static method (not duplicated per-view)
-- Share sheet via UIKit (not SwiftUI ShareLink) for full action support
+- Safari mobile layout pitfall (body flex column, no
+  viewport-fit=cover) — see CLAUDE.md
+- Xcode Cloud project-at-root requirement — see DECISIONS.md #002
 
-## Claude Skills Available
+**What the template intentionally doesn't bake in**:
+- Specific iOS bugs from past projects (VideoPlayer crash patterns,
+  share sheet quirks, etc.) — these live in skills, not the template
+- Skills enumeration — the global skill list is the source of truth,
+  not a table in CLAUDE.md
+- DESIGN.md / WEB-DESIGN.md content — create those per-project when
+  the project's UI complexity warrants it (see CLAUDE.md "When to
+  create a binding design doc")
 
-This template is designed to work with Claude Code skills that were used
-in building Bsky Dreams. See the full reference in CLAUDE.md. Highlights:
+## Learning orientation
 
-**UI/UX Design (Killer UI)**: `KUI:system`, `KUI:brand`, `KUI:screen`,
-`KUI:review`, `KUI:code`, `KUI:a11y`, `KUI:darkmode`, `KUI:trends`,
-`KUI:figma` — design system creation, accessibility audits, dark mode,
-design-to-code conversion.
-
-**App Store**: `app-store-screenshots` — generate screenshot pages and
-promotional assets for App Store listings.
-
-**iOS Development**: 40+ `all-ios-skills:*` skills covering SwiftUI,
-SwiftData, networking, security, concurrency, testing, performance,
-App Store review prep, and more.
-
-**Code Quality**: `simplify` for code review, `claude-api` for building
-with the Claude/Anthropic SDK.
-
-To use a skill, ask Claude directly: "Use KUI:system to create a design
-system" or "Run all-ios-skills:app-store-review to check for rejection
-risks."
-
-## Learning Orientation
-
-Every feature is evaluated against six criteria before implementation:
+Every feature is evaluated against the four-question test before
+implementation. See the `learning-orientation-design` skill:
 
 1. Does it deepen understanding?
 2. Does it invite participation?
 3. Does it support human agency?
-4. Clarity over cleverness
-5. Accessible by default (WCAG AA)
-6. Responsive from the start (mobile-first)
+4. Clarity over cleverness?
+
+A "no" to any is a redesign signal at proposal stage, not after
+shipping.

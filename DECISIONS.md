@@ -1,83 +1,93 @@
 # [APP NAME] — Architecture & Technology Decisions
 
-Entries are ordered by date. This file is **append-only** — never edit or
-remove past decisions. Platform noted where specific; unlabeled = both.
+Entries capture the *why* behind choices — not the *what* (the code
+already shows that). Each entry should answer: **"what would the next
+developer get wrong if they didn't know this?"** Lead with the rule,
+follow with `**Why:**` and `**How to apply:**`. Append-only.
+
+Invoke the `architectural-decision-log` skill when adding a new entry.
 
 ---
 
-## Decision 001 — Vanilla HTML/CSS/JS for Web
+## 001 — Vanilla HTML/CSS/JS for Web
 *Date: YYYY-MM-DD*
 
-**Decision**: No framework, no build step, no dependencies for the web app.
+No framework, no build step. GitHub Pages serves static files
+directly. Framework abstractions cost more than they save at this
+scale; adding one would require a build pipeline, a CI step, and a
+mental model every future contributor has to carry.
 
-**Rationale**: GitHub Pages serves static files directly. Framework
-abstractions cost more than they save at this scale. Aligns with
-clarity-over-cleverness.
+**Principle**: reach for complexity only when simplicity has actually
+failed, not when it might someday fail.
 
-**Alternatives considered**: React, Vue, Svelte — all require a build step.
-
-**Trade-offs**: Manual DOM manipulation, no reactive state. Revisit if
-component count exceeds ~20.
+**How to apply**: revisit if component count exceeds ~20 OR a feature
+genuinely needs reactive state across many components. Until then,
+plain DOM + ES2022 + Supabase SDK via CDN.
 
 ---
 
-## Decision 002 — Xcode Project at Repository Root
+## 002 — Xcode Project at Repository Root
 *Date: YYYY-MM-DD*
 
-**Decision**: The `.xcodeproj` lives at the repository root, not in a
-subdirectory. Project name has no spaces.
+`.xcodeproj` lives at repo root, no subdirectory, no spaces in
+project name.
 
-**Rationale**: Xcode Cloud requires `.xcodeproj` at the repository root.
-Spaces in paths cause issues with shell scripts, CI/CD, and Xcode Cloud's
-project discovery. Lesson learned from Bsky Dreams where
-`BskyDreams-iOS/Bsky Dreams/Bsky Dreams.xcodeproj` (two levels deep, spaces)
-caused persistent "Project does not exist at root" errors.
+**Why**: Xcode Cloud requires `.xcodeproj` at the repo root for
+auto-discovery. Spaces in paths cause shell-script and CI issues.
+Past project (`BskyDreams-iOS/Bsky Dreams/Bsky Dreams.xcodeproj`,
+two levels deep + spaces) cost hours debugging "Project does not
+exist at root."
 
-**Alternatives considered**: Subdirectory with Xcode Cloud custom workspace
-path — fragile, undocumented, breaks on Xcode updates.
-
-**Trade-offs**: Web and iOS files share the same root directory. Use
-`.gitignore` to keep build artifacts out of the web deployment.
+**How to apply**: when creating the Xcode project, save to repo
+root. Product name has no spaces. Move scaffolded `ios/` source
+files into the Xcode-created group, then delete the `ios/` directory.
 
 ---
 
-## Decision 003 — Shared Version Config (xcconfig)
+## 003 — Shared Version Config via xcconfig
 *Date: YYYY-MM-DD*
 
-**Decision**: `AppVersion.xcconfig` at repo root defines
-`MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`. All targets reference it.
+`AppVersion.xcconfig` at repo root defines `MARKETING_VERSION` and
+`CURRENT_PROJECT_VERSION`. All targets reference it.
 
-**Rationale**: Editing version numbers via Xcode's identity panel creates
-per-target overrides in `project.pbxproj` that shadow the xcconfig, causing
-targets to drift. A single xcconfig is the single source of truth.
+**Why**: editing version numbers via Xcode's identity panel creates
+per-target overrides in `project.pbxproj` that shadow the xcconfig,
+causing targets to drift silently.
 
-**Trade-offs**: Must remember to edit the xcconfig, not the Xcode UI.
+**How to apply**: ALWAYS edit `AppVersion.xcconfig` directly. Never
+use Xcode UI for version numbers. Bump on every ship as part of the
+`feature-shipping-discipline` 7-step sequence.
 
 ---
 
-## Decision 004 — SwiftUI + @Observable + SwiftData (iOS)
+## 004 — SwiftUI + @Observable + SwiftData (iOS)
 *Date: YYYY-MM-DD*
 
-**Decision**: SwiftUI for all UI. `@Observable` (iOS 17 macro) for state
-management. SwiftData for local persistence. UIKit only where SwiftUI lacks
-a native equivalent.
+SwiftUI for all UI. `@Observable` (iOS 17 macro) for state. SwiftData
+for local persistence. UIKit only where SwiftUI lacks a native
+equivalent.
 
-**Rationale**: Modern Apple stack, minimal boilerplate, no third-party
-dependencies.
+**Why**: modern Apple stack, minimal boilerplate, no third-party
+dependencies. iOS 17+ minimum is acceptable given current device
+share.
 
-**Trade-offs**: iOS 17+ minimum deployment target.
+**How to apply**: when navigating SwiftUI patterns, invoke
+`all-ios-skills:swiftui-patterns`. When UIKit interop is needed (camera,
+maps, AVKit), use `all-ios-skills:swiftui-uikit-interop`.
 
 ---
 
-## Decision 005 — Dual-Platform Feature Parity Model
+## 005 — Dual-Platform Feature Parity
 *Date: YYYY-MM-DD*
 
-**Decision**: Both platforms implement the same core feature set. Track
-parity in SCRATCHPAD.md. Platform-specific implementation choices are
-acceptable (e.g., Keychain vs localStorage for auth).
+Both platforms implement the same core feature set. Platform-specific
+implementation is acceptable (Keychain vs localStorage); platform-
+exclusive features are the exception, not the rule.
 
-**Rationale**: Users expect the same capabilities regardless of platform.
-Implementation details can differ to leverage each platform's strengths.
+**Why**: users expect the same capabilities regardless of platform.
+Implementation details can differ to leverage each platform's
+strengths.
 
-**Trade-offs**: Every feature is effectively built twice. Mitigated by
-shared API contracts and design tokens.
+**How to apply**: track parity in SCRATCHPAD.md feature table. When
+adding to one platform, note the equivalent work needed on the other.
+Shared design tokens + API contracts mitigate the "built twice" cost.
