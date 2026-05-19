@@ -26,9 +26,23 @@ FRONTEND_DESIGN_SRC="$PLUGIN_CACHE/claude-plugins-official/frontend-design/unkno
 
 # GitHub-tracked skills — cloned to ~/.claude/sources/<name>/ and refreshed
 # from upstream. Each entry: "<local-name>|<git-url>|<path-inside-repo>"
+# (path "." means the whole repo root is the skill content)
 GITHUB_SKILLS=(
   "app-store-screenshots|https://github.com/ParthJadhav/app-store-screenshots.git|skills/app-store-screenshots"
+  "killer-ui|https://github.com/BigSiggis/Killer-UI.git|."
 )
+
+# Killer-UI's GitHub repo also ships the KUI/* slash commands at /commands/.
+# After GITHUB_SKILLS sync, mirror those into the template's KUI commands
+# folder. (Special-case; if more multi-artifact repos show up, generalize.)
+KILLER_UI_COMMANDS_SRC="$SOURCES/killer-ui/commands"
+KILLER_UI_COMMANDS_DEST="$COMMANDS_DIR/KUI"
+
+# When path-inside-repo is ".", exclude these from the skill rsync so we
+# don't bring repo-housekeeping files into .claude/skills/<name>/.
+ROOT_SYNC_EXCLUDES=(--exclude=README.md --exclude=install.sh
+  --exclude=commands --exclude=assets --exclude=.git --exclude=.github
+  --exclude=LICENSE --exclude=CONTRIBUTING.md)
 
 # User-authored — live in ~/.claude/, refreshed alongside marketplace pulls
 USER_SKILLS_SRC="$USER_CLAUDE/skills"
@@ -120,14 +134,34 @@ for entry in "${GITHUB_SKILLS[@]}"; do
     git clone --depth 1 --quiet "$url" "$repo_dir" || { warn "clone failed for $name"; continue; }
     ok "$name cloned"
   fi
-  src="$repo_dir/$subpath"
-  if [ -d "$src" ]; then
-    rsync -aL --delete "$src/" "$SKILLS_DIR/$name/"
-    ok "  synced into $SKILLS_DIR/$name/"
+  # Resolve source path inside the cloned repo
+  if [ "$subpath" = "." ]; then
+    src="$repo_dir"
+    sync_args=(-aL --delete "${ROOT_SYNC_EXCLUDES[@]}")
   else
-    warn "  expected $subpath inside $name repo, not found — leaving vendored copy alone"
+    src="$repo_dir/$subpath"
+    sync_args=(-aL --delete)
+    if [ ! -d "$src" ]; then
+      warn "  expected $subpath inside $name repo, not found — skipping"
+      continue
+    fi
   fi
+  # Refresh the user's global install (~/.claude/skills/<name>/). The
+  # user-authored sync below then mirrors that into the template, so we
+  # don't end up with a stale ~/.claude/skills/<name>/ overwriting fresh
+  # upstream content.
+  mkdir -p "$USER_SKILLS_SRC/$name"
+  rsync "${sync_args[@]}" "$src/" "$USER_SKILLS_SRC/$name/"
+  ok "  refreshed global install at $USER_SKILLS_SRC/$name/"
 done
+
+# Mirror killer-ui's commands/ into the user's global KUI commands folder.
+# (User-authored sync below copies that into the template.)
+if [ -d "$KILLER_UI_COMMANDS_SRC" ]; then
+  mkdir -p "$USER_KUI_SRC"
+  rsync -aL --delete "$KILLER_UI_COMMANDS_SRC/" "$USER_KUI_SRC/"
+  ok "killer-ui commands refreshed at $USER_KUI_SRC/"
+fi
 
 # 3. Sync user-authored skills ----------------------------------------------
 # These are the ones you wrote yourself in ~/.claude/skills/. They're not
