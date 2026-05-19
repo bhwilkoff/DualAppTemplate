@@ -84,6 +84,31 @@ code, a11y, darkmode, trends, figma).
 **App Store**: `app-store-screenshots` for marketing assets,
 `all-ios-skills:app-store-review` for rejection prevention.
 
+## Skills bundled with the template
+
+Skills and slash commands are vendored directly into `.claude/` so
+anyone who clones this repo has everything available immediately —
+no `~/.claude/` configuration, no marketplace installs, no second
+repository to track.
+
+**What's bundled** (in `.claude/skills/` and `.claude/commands/KUI/`):
+
+| Source | What | Update path |
+|---|---|---|
+| `swift-ios-skills` marketplace | 80+ Apple framework skills (SwiftUI, SwiftData, networking, Liquid Glass, App Intents, …) | refresh from upstream |
+| `ui-ux-pro-max-skill` marketplace | `ui-ux-pro-max` design intelligence skill | refresh from upstream |
+| `claude-plugins-official` | `frontend-design` skill | refresh from upstream |
+| User-authored (template maintainer) | 13 methodology + design skills (`learning-orientation-design`, `feature-shipping-discipline`, `architectural-decision-log`, `binding-design-doc-discipline`, `mobile-first-density-design`, `native-platform-first`, `universal-feature-states`, `3d-feature-*`, `realitykit-3d-card-rendering`, `tvos-platform-patterns`, `app-store-screenshots`, `killer-ui`) | hand-edited |
+| User-authored | `KUI:*` slash commands (a11y / brand / code / darkmode / figma / review / screen / system / trends) | hand-edited |
+
+**Refreshing marketplace skills**: maintainer runs
+`tools/refresh-skills.sh`. The script pulls latest commits from the
+marketplace git checkouts in `~/.claude/plugins/marketplaces/`,
+rsyncs them into `.claude/skills/`, and also re-syncs user-authored
+skills from `~/.claude/skills/` and `~/.claude/commands/KUI/`. Safe
+to re-run; reports diffs. Commit the changes to publish refreshed
+skills to template users.
+
 ## What this template encodes
 
 **From previous production builds**:
@@ -99,8 +124,6 @@ code, a11y, darkmode, trends, figma).
 **What the template intentionally doesn't bake in**:
 - Specific iOS bugs from past projects (VideoPlayer crash patterns,
   share sheet quirks, etc.) — these live in skills, not the template
-- Skills enumeration — the global skill list is the source of truth,
-  not a table in CLAUDE.md
 - DESIGN.md / WEB-DESIGN.md content — create those per-project when
   the project's UI complexity warrants it (see CLAUDE.md "When to
   create a binding design doc")
