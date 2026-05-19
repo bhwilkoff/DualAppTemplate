@@ -17,11 +17,18 @@ COMMANDS_DIR="$TEMPLATE_ROOT/.claude/commands"
 USER_CLAUDE="$HOME/.claude"
 MARKETPLACES="$USER_CLAUDE/plugins/marketplaces"
 PLUGIN_CACHE="$USER_CLAUDE/plugins/cache"
+SOURCES="$USER_CLAUDE/sources"   # GitHub-tracked skills not in any marketplace
 
 # Marketplace skills — sourced from your installed plugin marketplaces
 SWIFT_IOS_SKILLS_SRC="$MARKETPLACES/swift-ios-skills/skills"
 UI_UX_PRO_MAX_SRC="$MARKETPLACES/ui-ux-pro-max-skill/.claude/skills/ui-ux-pro-max"
 FRONTEND_DESIGN_SRC="$PLUGIN_CACHE/claude-plugins-official/frontend-design/unknown/skills/frontend-design"
+
+# GitHub-tracked skills — cloned to ~/.claude/sources/<name>/ and refreshed
+# from upstream. Each entry: "<local-name>|<git-url>|<path-inside-repo>"
+GITHUB_SKILLS=(
+  "app-store-screenshots|https://github.com/ParthJadhav/app-store-screenshots.git|skills/app-store-screenshots"
+)
 
 # User-authored — live in ~/.claude/, refreshed alongside marketplace pulls
 USER_SKILLS_SRC="$USER_CLAUDE/skills"
@@ -68,19 +75,20 @@ sync_marketplace_skill() {
     warn "$label source missing at $src — skipping"
     return
   fi
-  # Per-skill copy so we don't blow away user-authored siblings
+  # -L dereferences symlinks so cloners get real files, not broken links.
+  # Per-skill copy so we don't blow away user-authored siblings.
   local count=0
   if [ -f "$src/SKILL.md" ]; then
     # single-skill source (e.g. ui-ux-pro-max, frontend-design)
     local name=$(basename "$src")
-    rsync -a --delete "$src/" "$SKILLS_DIR/$name/"
+    rsync -aL --delete "$src/" "$SKILLS_DIR/$name/"
     count=1
   else
     # multi-skill source (e.g. swift-ios-skills/skills/)
     for skill in "$src"/*/; do
       [ -d "$skill" ] || continue
       local name=$(basename "$skill")
-      rsync -a --delete "$skill" "$SKILLS_DIR/$name/"
+      rsync -aL --delete "$skill" "$SKILLS_DIR/$name/"
       count=$((count + 1))
     done
   fi
@@ -90,6 +98,36 @@ sync_marketplace_skill() {
 sync_marketplace_skill "$SWIFT_IOS_SKILLS_SRC" "swift-ios-skills"
 sync_marketplace_skill "$UI_UX_PRO_MAX_SRC"    "ui-ux-pro-max"
 sync_marketplace_skill "$FRONTEND_DESIGN_SRC"  "frontend-design"
+
+# 2b. Sync GitHub-tracked skills (not in any marketplace) -------------------
+say "Refreshing GitHub-tracked skills..."
+
+mkdir -p "$SOURCES"
+for entry in "${GITHUB_SKILLS[@]}"; do
+  IFS='|' read -r name url subpath <<< "$entry"
+  repo_dir="$SOURCES/$name"
+  if [ -d "$repo_dir/.git" ]; then
+    before=$(git -C "$repo_dir" rev-parse --short HEAD)
+    git -C "$repo_dir" pull --ff-only --quiet 2>/dev/null || warn "could not pull $name (offline?)"
+    after=$(git -C "$repo_dir" rev-parse --short HEAD)
+    if [ "$before" != "$after" ]; then
+      ok "$name updated: $before → $after"
+    else
+      ok "$name up to date ($before)"
+    fi
+  else
+    say "  cloning $name from $url ..."
+    git clone --depth 1 --quiet "$url" "$repo_dir" || { warn "clone failed for $name"; continue; }
+    ok "$name cloned"
+  fi
+  src="$repo_dir/$subpath"
+  if [ -d "$src" ]; then
+    rsync -aL --delete "$src/" "$SKILLS_DIR/$name/"
+    ok "  synced into $SKILLS_DIR/$name/"
+  else
+    warn "  expected $subpath inside $name repo, not found — leaving vendored copy alone"
+  fi
+done
 
 # 3. Sync user-authored skills ----------------------------------------------
 # These are the ones you wrote yourself in ~/.claude/skills/. They're not

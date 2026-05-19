@@ -98,8 +98,9 @@ repository to track.
 | `swift-ios-skills` marketplace | 80+ Apple framework skills (SwiftUI, SwiftData, networking, Liquid Glass, App Intents, …) | refresh from upstream |
 | `ui-ux-pro-max-skill` marketplace | `ui-ux-pro-max` design intelligence skill | refresh from upstream |
 | `claude-plugins-official` | `frontend-design` skill | refresh from upstream |
-| User-authored (template maintainer) | 13 methodology + design skills (`learning-orientation-design`, `feature-shipping-discipline`, `architectural-decision-log`, `binding-design-doc-discipline`, `mobile-first-density-design`, `native-platform-first`, `universal-feature-states`, `3d-feature-*`, `realitykit-3d-card-rendering`, `tvos-platform-patterns`, `app-store-screenshots`, `killer-ui`) | hand-edited |
-| User-authored | `KUI:*` slash commands (a11y / brand / code / darkmode / figma / review / screen / system / trends) | hand-edited |
+| [ParthJadhav/app-store-screenshots](https://github.com/ParthJadhav/app-store-screenshots) | `app-store-screenshots` | refresh from upstream (GitHub-tracked, cloned to `~/.claude/sources/`) |
+| Template maintainer | 12 methodology + design skills (`learning-orientation-design`, `feature-shipping-discipline`, `architectural-decision-log`, `binding-design-doc-discipline`, `mobile-first-density-design`, `native-platform-first`, `universal-feature-states`, `3d-feature-*`, `realitykit-3d-card-rendering`, `tvos-platform-patterns`, `killer-ui`) | hand-edited |
+| Template maintainer | `KUI:*` slash commands (a11y / brand / code / darkmode / figma / review / screen / system / trends) | hand-edited |
 
 **Refreshing marketplace skills**: maintainer runs
 `tools/refresh-skills.sh`. The script pulls latest commits from the
