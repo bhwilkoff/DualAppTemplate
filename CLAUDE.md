@@ -37,6 +37,16 @@ swiftui-patterns, swiftui-navigation, swiftdata, ios-networking,
 swiftui-liquid-glass, etc.). Design skills live under `KUI:<name>`.
 Invoke by name as needed.
 
+**If this is a tvOS project**, also invoke `tvos-platform-patterns`
+before any UI / focus / layout / image-pipeline work. The generic
+SwiftUI / iOS skills cover most of tvOS, but focus engine, ten-foot
+typography, sidebar / hero / shelf / detail / search / playback
+recipes, and tvOS-specific gotchas (`buttonStyle(.plain)` destroying
+focus, `@Query` macro cascading scope errors, `defaultFocus` vs.
+`onAppear` races) are not covered elsewhere. Bootstrap a
+`docs/tvos-playbook.md` once the project has ≥ 3 of {Home / Browse
+/ Detail / Player / Search} — the skill is the seed.
+
 ---
 
 ## Debugging philosophy
